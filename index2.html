@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>医学教育の現状とニーズについて (レスポンシブ対応)</title>
+    <style>
+        /* Basic Reset & Typography */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Use rem for scalable font sizes */
+        html {
+            font-size: 16px; /* Base font size */
+        }
+
+        body {
+            font-family: 'Segoe UI', Meiryo, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', sans-serif;
+            line-height: 1.7;
+            color: #333;
+            background-color: #f4f4f4;
+            overflow: hidden; /* Prevent body scrollbars */
+        }
+
+        /* Presentation Container */
+        .presentation-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Slide Styling */
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex; /* Use flexbox for centering content */
+            flex-direction: column;
+            justify-content: center; /* Center vertically */
+            align-items: center; /* Center horizontally */
+            padding: 3rem 2rem 6rem 2rem; /* Added padding-bottom for buttons: Top Right Bottom Left */
+            text-align: center;
+            background-color: #fff;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.8s ease-in-out, visibility 0.8s;
+            z-index: 1;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            z-index: 2;
+        }
+
+        /* Slide Content Wrapper for Scrolling */
+        .slide-content {
+            width: 100%;
+            max-width: 800px; /* Limit content width */
+            height: auto; /* Height based on content */
+            /* Calculate max-height: 100vh - top_padding - bottom_padding (for buttons) */
+            max-height: calc(100vh - 3rem - 6rem);
+            overflow-y: auto; /* Enable vertical scroll if content overflows */
+            padding: 1rem; /* Add some internal padding */
+            text-align: left; /* Align text left within the content area */
+        }
+         /* Custom scrollbar (optional) */
+        .slide-content::-webkit-scrollbar {
+            width: 8px;
+        }
+        .slide-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .slide-content::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        .slide-content::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+
+        /* Slide Content Styling (using rem) */
+        .slide h1 {
+            font-size: 2.5rem; /* Adjusted size */
+            margin-bottom: 1rem;
+            color: #0056b3;
+            text-align: center; /* Center title */
+            transform: translateY(-20px);
+            opacity: 0;
+            transition: transform 0.6s ease-out 0.5s, opacity 0.6s ease-out 0.5s;
+        }
+
+        .slide.active h1 {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .slide h2 {
+            font-size: 1.8rem; /* Adjusted size */
+            margin-bottom: 1.5rem;
+            color: #007bff;
+             text-align: center; /* Center subtitle */
+            transform: scale(0.8);
+            opacity: 0;
+            transition: transform 0.6s ease-out 0.7s, opacity 0.6s ease-out 0.7s;
+        }
+
+        .slide.active h2 {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+
+        .slide p, .slide ul {
+            font-size: 1.1rem; /* Adjusted size */
+           /* max-width removed here, handled by .slide-content */
+            margin-bottom: 1.2rem;
+            transform: translateX(-20px);
+            opacity: 0;
+            transition: transform 0.6s ease-out 0.9s, opacity 0.6s ease-out 0.9s;
+        }
+         .slide ul {
+            list-style: none;
+            padding-left: 0;
+         }
+         .slide li {
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%23007bff" class="bi bi-check-circle-fill" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg>') no-repeat left 0.3em; /* Adjust icon position */
+            padding-left: 1.8rem; /* Space for the icon */
+            margin-bottom: 0.8rem;
+            transform: translateX(-20px);
+            opacity: 0;
+            transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+         }
+
+        .slide.active p, .slide.active ul {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        /* Staggered list item animation */
+        .slide.active li:nth-child(1) { transition-delay: 1.0s; transform: translateX(0); opacity: 1; }
+        .slide.active li:nth-child(2) { transition-delay: 1.1s; transform: translateX(0); opacity: 1; }
+        .slide.active li:nth-child(3) { transition-delay: 1.2s; transform: translateX(0); opacity: 1; }
+        .slide.active li:nth-child(4) { transition-delay: 1.3s; transform: translateX(0); opacity: 1; }
+        .slide.active li:nth-child(5) { transition-delay: 1.4s; transform: translateX(0); opacity: 1; }
+        /* Add more if needed */
+        .slide.active li:nth-child(6) { transition-delay: 1.5s; transform: translateX(0); opacity: 1; }
+
+
+        /* Specific Slide Backgrounds */
+        #slide-1 { background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%); }
+        #slide-2 { background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); }
+        #slide-3 { background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); }
+        #slide-4 { background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%); }
+        #slide-5 { background: linear-gradient(135deg, #ede7f6 0%, #d1c4e9 100%); }
+        #slide-6 { background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); }
+        #slide-7 { background: linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 100%); }
+
+        /* Navigation Buttons */
+        .nav-button {
+            position: fixed;
+            bottom: 1.5rem; /* Adjusted position */
+            padding: 0.6rem 1.2rem;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            z-index: 10;
+            transition: background-color 0.3s, transform 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .nav-button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+        .nav-button:active {
+             transform: translateY(0);
+        }
+
+        #prevBtn {
+            left: 1.5rem; /* Adjusted position */
+        }
+
+        #nextBtn {
+            right: 1.5rem; /* Adjusted position */
+        }
+
+        /* Emphasis styling */
+        .highlight {
+            font-weight: bold;
+            color: #d9534f;
+        }
+        .need-high { font-weight: bold; color: #dc3545; background-color: #f8d7da; padding: 2px 5px; border-radius: 3px; display: inline-block; margin-top: 2px; margin-bottom: 2px; }
+        .need-medium { font-weight: bold; color: #ffc107; background-color: #fff3cd; padding: 2px 5px; border-radius: 3px; display: inline-block; margin-top: 2px; margin-bottom: 2px;}
+        .need-low { font-weight: bold; color: #198754; background-color: #d1e7dd; padding: 2px 5px; border-radius: 3px; display: inline-block; margin-top: 2px; margin-bottom: 2px;}
+        .efficiency { font-weight: bold; color: #0dcaf0; background-color: #cff4fc; padding: 2px 5px; border-radius: 3px; display: inline-block; margin-top: 2px; margin-bottom: 2px;}
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            html {
+                font-size: 14px; /* Smaller base font size for smaller screens */
+            }
+            .slide {
+                 padding: 2rem 1rem 5rem 1rem; /* Adjust padding for smaller screens */
+            }
+            .slide-content {
+                /* Adjust max-height calculation for new padding */
+                 max-height: calc(100vh - 2rem - 5rem);
+                 padding: 0.5rem; /* Reduce internal padding */
+            }
+             .slide h1 {
+                font-size: 2rem;
+            }
+            .slide h2 {
+                font-size: 1.5rem;
+            }
+             .slide p, .slide ul {
+                font-size: 1rem;
+            }
+            .nav-button {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+                bottom: 1rem;
+            }
+            #prevBtn { left: 1rem; }
+            #nextBtn { right: 1rem; }
+        }
+
+         @media (max-width: 480px) {
+             html {
+                font-size: 13px; /* Even smaller for phones */
+            }
+            .slide h1 {
+                font-size: 1.8rem;
+            }
+            .slide h2 {
+                font-size: 1.3rem;
+            }
+         }
+
+    </style>
+</head>
+<body>
+
+    <div class="presentation-container">
+
+        <!-- Slide 1: Title -->
+        <section id="slide-1" class="slide active">
+            <div class="slide-content">
+                <h1>医学教育の現状とニーズについて</h1>
+                <h2>医学生向け問題集サービスのご提案</h2>
+                <h2>奈良医大　井垣逹詞</h2>
+            </div>
+        </section>
+
+        <!-- Slide 2: Overview -->
+        <section id="slide-2" class="slide">
+             <div class="slide-content">
+                 <h2>医学生の学習ステップと課題</h2>
+                 <p>医学生は6年間の課程で膨大な知識を習得し、厳しい試験を乗り越える必要があります。各学年で直面する課題と、それに応じた学習ツールのニーズは異なります。本日は、その現状を分析し、新しい問題集サービスの機会を探ります。</p>
+                 <ul style="margin-top: 1.5rem;">
+                    <li>1回生：基礎学力と専門科目への適応</li>
+                    <li>2-3回生：基礎医学の壁と進級</li>
+                    <li>4回生：臨床医学と試験（CBT/OSCE）</li>
+                    <li>5-6回生：臨床実習と国家試験</li>
+                 </ul>
+            </div>
+        </section>
+
+        <!-- Slide 3: Year 1 -->
+        <section id="slide-3" class="slide">
+             <div class="slide-content">
+                <h2>医学科 <span class="highlight">1回生</span> の状況とニーズ</h2>
+                <p>一般教養科目が多く、専門科目の比重はまだ低い段階です。しかし...</p>
+                <ul>
+                    <li>ほとんどの科目は標準的な難易度。</li>
+                    <li>一部、<span class="highlight">特定の専門基礎科目（例：化学、物理、生物学、解剖学緒論など）</span>で難易度が高く、進級の障壁となるケースがある。</li>
+                    <li>これらの特定科目に絞った問題演習のニーズが存在。 <span class="need-low">【ニーズ：低〜中】</span></li>
+                    <li>大学生活への適応や、効率的な学習習慣の確立も課題。</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Slide 4: Year 2-3 -->
+        <section id="slide-4" class="slide">
+             <div class="slide-content">
+                 <h2>医学科 <span class="highlight">2、3回生</span> の状況とニーズ</h2>
+                 <p>基礎医学（解剖学、生理学、生化学、薬理学、病理学など）が中心となり、学習負荷が急増する時期です。</p>
+                 <ul>
+                    <li>専門科目の比重が一気に高まり、内容も高度化・複雑化。</li>
+                    <li><span class="highlight">担当教員の専門性が高く、大学・教員ごとの出題傾向や形式の独自性が強い。</span></li>
+                    <li>試験対策が難しく、<span class="highlight">留年率が最も高い学年</span>。</li>
+                    <li>過去問以外の、質の高い多様な演習問題への渇望が強い。</li>
+                    <li><span class="need-high">【問題集ニーズ：極めて高い】</span></li>
+                 </ul>
+            </div>
+        </section>
+
+        <!-- Slide 5: Year 4 -->
+        <section id="slide-5" class="slide">
+             <div class="slide-content">
+                 <h2>医学科 <span class="highlight">4回生</span> の状況とニーズ</h2>
+                 <p>臨床医学の講義が始まり、CBT（Computer-Based Testing）やOSCE（Objective Structured Clinical Examination）といった共用試験が控える重要な時期です。</p>
+                 <ul>
+                    <li>臨床科目は多岐にわたり、学習範囲が膨大。</li>
+                    <li>試験は国試（医師国家試験）に準拠した形式・範囲が多くなる傾向。</li>
+                    <li>しかし、<span class="highlight">CBTや国試の過去問だけでは、各大学の定期試験対策としては不十分</span>な場合が多い。</li>
+                    <li>科目数が非常に多いため、<span class="efficiency">時間効率の良い学習</span>が強く求められる。</li>
+                    <li>網羅的かつ効率的に学習できる問題集へのニーズが存在。<span class="need-medium">【ニーズ：中〜高】</span></li>
+                 </ul>
+            </div>
+        </section>
+
+        <!-- Slide 6: Year 5-6 -->
+        <section id="slide-6" class="slide">
+             <div class="slide-content">
+                 <h2>医学科 <span class="highlight">5、6回生</span> の状況とニーズ</h2>
+                 <p>臨床実習（ポリクリ、クリクラ）が中心となり、医師国家試験対策が本格化する時期です。</p>
+                 <ul>
+                    <li>学習の中心は、臨床現場での経験と国試対策。</li>
+                    <li>問題演習としては、<span class="highlight">主に国試やCBTの過去問データベースが活用される</span>。</li>
+                    <li>多くの学生は、既存の過去問サービスで<span class="highlight">「必要十分」と感じている</span>傾向がある。</li>
+                    <li>新たな独自問題集へのニーズは、他の学年に比べると相対的に低い可能性。<span class="need-low">【ニーズ：低】</span></li>
+                    <li>ただし、知識の整理や弱点補強、実習と連動した演習など、特定の付加価値があれば需要の可能性も。</li>
+                    <li>(ここにさらにコンテンツを追加してスクロールをテストできます)</li>
+                    <li>(例: さらに長い説明文やリスト項目を追加...)</li>
+                    <li>(例: さらに長い説明文やリスト項目を追加...)</li>
+                    <li>(例: さらに長い説明文やリスト項目を追加...)</li>
+                    <li>(例: さらに長い説明文やリスト項目を追加...)</li>
+                 </ul>
+            </div>
+        </section>
+
+         <!-- Slide 7: Conclusion -->
+        <section id="slide-7" class="slide">
+             <div class="slide-content">
+                <h2>まとめ：学年別ニーズとサービス機会</h2>
+                 <p>医学生の学習ニーズは学年ごとに大きく変動します。</p>
+                 <ul>
+                    <li><span class="highlight">1回生：</span> 特定科目のピンポイントな対策支援。</li>
+                    <li><span class="need-high">2-3回生：</span> 大学・教員別の傾向に対応した、質の高い多様な基礎医学問題集。<span class="highlight">【最大のニーズ】</span></li>
+                    <li><span class="need-medium">4回生：</span> 膨大な臨床科目を<span class="efficiency">効率的に</span>網羅できる、試験対策問題集。</li>
+                    <li><span class="need-low">5-6回生：</span> 国試過去問演習が中心。付加価値（知識整理、弱点分析、実習連携など）があれば差別化可能。</li>
+                 </ul>
+                 <p style="margin-top: 1.5rem;">これらの分析から、特に<span class="highlight">2-4回生</span>をメインターゲットとし、<span class="efficiency">効率性</span>と<span class="highlight">大学・科目別の対応力</span>を強みとした問題集サービスに大きな事業機会があると結論付けられます。</p>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Navigation -->
+    <button id="prevBtn" class="nav-button" onclick="changeSlide(-1)">← 前へ</button>
+    <button id="nextBtn" class="nav-button" onclick="changeSlide(1)">次へ →</button>
+
+    <script>
+        let currentSlideIndex = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        const slideContents = document.querySelectorAll('.slide-content'); // Get all content divs
+
+        function showSlide(index) {
+            // Reset scroll position of the outgoing slide's content
+            if (slides[currentSlideIndex]) {
+                 const contentDiv = slides[currentSlideIndex].querySelector('.slide-content');
+                 if(contentDiv) {
+                    contentDiv.scrollTop = 0; // Reset scroll to top
+                 }
+            }
+
+
+            slides.forEach((slide, i) => {
+                 // Use classList.toggle for cleaner add/remove based on condition
+                slide.classList.toggle('active', i === index);
+            });
+
+
+            // Update button visibility
+            document.getElementById('prevBtn').style.display = index === 0 ? 'none' : 'block';
+            document.getElementById('nextBtn').style.display = index === totalSlides - 1 ? 'none' : 'block';
+
+             // Ensure the new active slide's content is scrolled to top (might be redundant but safe)
+             if (slides[index]) {
+                 const activeContentDiv = slides[index].querySelector('.slide-content');
+                 if(activeContentDiv) {
+                    // Timeout helps ensure the element is fully visible and scrollable before resetting
+                    setTimeout(() => { activeContentDiv.scrollTop = 0; }, 0);
+                 }
+            }
+             currentSlideIndex = index; // Update index *after* using the old one for scroll reset
+        }
+
+        function changeSlide(direction) {
+            let nextIndex = currentSlideIndex + direction;
+
+            // Clamp index within bounds
+            if (nextIndex < 0) {
+                nextIndex = 0;
+            } else if (nextIndex >= totalSlides) {
+                nextIndex = totalSlides - 1;
+            }
+
+             // Only proceed if the index actually changes
+            if(nextIndex !== currentSlideIndex){
+                showSlide(nextIndex);
+            }
+        }
+
+        // Initialize first slide
+        document.addEventListener('DOMContentLoaded', () => {
+            showSlide(0);
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowRight' || event.key === ' ') {
+                if(event.key === ' ') event.preventDefault();
+                // Check we are not on the last slide BEFORE trying to advance
+                if(currentSlideIndex < totalSlides - 1) {
+                     changeSlide(1);
+                }
+            } else if (event.key === 'ArrowLeft') {
+                 // Check we are not on the first slide BEFORE trying to go back
+                if(currentSlideIndex > 0) {
+                     changeSlide(-1);
+                }
+            }
+        });
+
+    </script>
+
+</body>
+</html>
